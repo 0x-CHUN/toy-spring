@@ -13,4 +13,17 @@ public class FileSystemApplicationContextTest {
         UserService userService = (UserService) context.getBean("userService");
         assertNotNull(userService);
     }
+
+    @Test
+    public void getBeanV2() {
+        ApplicationContext context = new FileSystemApplicationContext("src/test/resources/bean-v2.xml");
+        UserService userService = (UserService) context.getBean("userService");
+        assertNotNull(userService);
+
+        assertNotNull(userService.getItemDao());
+        assertNotNull(userService.getAccountDao());
+        assertEquals(userService.getOwner(), "test");
+        assertEquals(userService.getVersion(), 2);
+        assertTrue(userService.isChecked());
+    }
 }

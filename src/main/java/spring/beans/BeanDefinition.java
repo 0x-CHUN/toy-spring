@@ -1,5 +1,7 @@
 package spring.beans;
 
+import java.util.List;
+
 public interface BeanDefinition {
     String getBeanClassName();
 
@@ -10,5 +12,7 @@ public interface BeanDefinition {
     ScopeType getScope();
 
     void setScope(ScopeType scopeType);
+
+    List<PropertyValue> getPropertyValues();
 
 }

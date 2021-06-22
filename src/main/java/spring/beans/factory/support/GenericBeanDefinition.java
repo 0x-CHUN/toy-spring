@@ -1,13 +1,18 @@
 package spring.beans.factory.support;
 
 import spring.beans.BeanDefinition;
+import spring.beans.PropertyValue;
 import spring.beans.ScopeType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GenericBeanDefinition implements BeanDefinition {
     private String beanId;
     private String beanClassName;
 
     private ScopeType scopeType = ScopeType.DEFAULT;
+    private List<PropertyValue> propertyValues = new ArrayList<>();
 
     public GenericBeanDefinition(String beanId, String beanClassName) {
         this.beanId = beanId;
@@ -37,5 +42,10 @@ public class GenericBeanDefinition implements BeanDefinition {
     @Override
     public void setScope(ScopeType scopeType) {
         this.scopeType = scopeType;
+    }
+
+    @Override
+    public List<PropertyValue> getPropertyValues() {
+        return this.propertyValues;
     }
 }
