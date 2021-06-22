@@ -4,6 +4,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import spring.beans.BeanDefinition;
 import spring.beans.factory.BeanFactory;
 
 import java.io.File;
@@ -13,43 +14,40 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DefaultBeanFactory implements BeanFactory {
-    private static final Map<String, String> BEAN_MAP = new HashMap<>();
+public class DefaultBeanFactory implements BeanFactory, BeanDefinitionRegistry {
+    private static final Map<String, BeanDefinition> BEAN_MAP = new HashMap<>();
 
-    public DefaultBeanFactory(String configPath) {
-        // todo: check the configPath
-        URL url = Thread.currentThread().getContextClassLoader().getResource(configPath);
-        File file = new File(url.getPath());
-        SAXReader reader = new SAXReader();
-        Document document;
-        try {
-            document = reader.read(file);
-        } catch (DocumentException e) {
-            e.printStackTrace();
-            return;
-        }
-        Element root = document.getRootElement();
-        List<Element> elements = root.elements();
-        for (Element element : elements) {
-            BEAN_MAP.put(element.attribute("id").getValue(), element.attribute("class").getValue());
-        }
+    public DefaultBeanFactory() {
     }
 
     @Override
     public Object getBean(String beanId) {
-        String beanClassName = BEAN_MAP.get(beanId);
+        // todo: check bean exist
+        // todo: solve exception
+        // todo: constructor
+
+        BeanDefinition definition = BEAN_MAP.get(beanId);
         Class target = null;
         try {
-            target = Thread.currentThread().getContextClassLoader().loadClass(beanClassName);
+            target = Thread.currentThread().getContextClassLoader().loadClass(definition.getBeanClassName());
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         try {
-            assert target != null;
             return target.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public BeanDefinition getBeanDefinition(String beanId) {
+        return BEAN_MAP.get(beanId);
+    }
+
+    @Override
+    public void registryBeanDefinition(String beanId, BeanDefinition beanDefinition) {
+        BEAN_MAP.put(beanId, beanDefinition);
     }
 }
