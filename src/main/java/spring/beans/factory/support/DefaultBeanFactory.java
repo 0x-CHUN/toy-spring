@@ -13,9 +13,10 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class DefaultBeanFactory implements BeanFactory, BeanDefinitionRegistry {
-    private static final Map<String, BeanDefinition> BEAN_MAP = new HashMap<>();
+public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory, BeanDefinitionRegistry {
+    private static final Map<String, BeanDefinition> BEAN_MAP = new ConcurrentHashMap<>();
 
     public DefaultBeanFactory() {
     }
@@ -27,6 +28,18 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionRegistry {
         // todo: constructor
 
         BeanDefinition definition = BEAN_MAP.get(beanId);
+        if (definition.isSingleton()) {
+            Object bean = this.getSingletonObject(beanId);
+            if (bean == null) {
+                bean = createBean(definition);
+                this.registerSingleton(beanId, bean);
+            }
+            return bean;
+        }
+        return createBean(definition);
+    }
+
+    private Object createBean(BeanDefinition definition) {
         Class target = null;
         try {
             target = Thread.currentThread().getContextClassLoader().loadClass(definition.getBeanClassName());

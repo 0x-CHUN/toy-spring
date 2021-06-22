@@ -4,6 +4,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import spring.beans.BeanDefinition;
+import spring.beans.ScopeType;
 import spring.beans.factory.support.BeanDefinitionRegistry;
 import spring.beans.factory.support.GenericBeanDefinition;
 import spring.core.io.Resource;
@@ -28,6 +29,10 @@ public class XmlBeanDefinitionReader {
             for (Element element : elements) {
                 beanDefinition = new GenericBeanDefinition(element.attribute("id").getValue(),
                         element.attribute("class").getValue());
+                if (element.attribute("scope") != null) {
+                    //todo: check scope format
+                    beanDefinition.setScope(ScopeType.getType(element.attribute("scope").getValue()));
+                }
                 registry.registryBeanDefinition(element.attribute("id").getValue(), beanDefinition);
             }
         } catch (Exception e) {
