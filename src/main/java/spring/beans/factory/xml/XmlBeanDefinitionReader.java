@@ -4,6 +4,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import spring.beans.BeanDefinition;
+import spring.beans.ConstructorArgument;
 import spring.beans.PropertyValue;
 import spring.beans.ScopeType;
 import spring.beans.factory.config.RuntimeBeanReference;
@@ -53,6 +54,8 @@ public class XmlBeanDefinitionReader {
                     //todo: check scope format
                     beanDefinition.setScope(ScopeType.getType(element.attribute("scope").getValue()));
                 }
+                // inject constructor
+                parseConstructorArgElements(element, beanDefinition);
                 // inject value of element into bean
                 parsePropertyElement(element, beanDefinition);
                 registry.registryBeanDefinition(element.attribute("id").getValue(), beanDefinition);
@@ -61,6 +64,29 @@ public class XmlBeanDefinitionReader {
             // todo: exception
             throw new RuntimeException("parse bean definition file error", e);
         }
+    }
+
+    private void parseConstructorArgElements(Element element, BeanDefinition beanDefinition) {
+        Iterator iterator = element.elementIterator(CONSTRUCTOR_ARG_ELEMENT);
+        while (iterator.hasNext()) {
+            Element ele = (Element) iterator.next();
+            parseConstructorArgElement(ele, beanDefinition);
+        }
+    }
+
+    private void parseConstructorArgElement(Element element, BeanDefinition beanDefinition) {
+        String type = element.attributeValue(TYPE_ATTRIBUTE);
+        String name = element.attributeValue(NAME_ATTRIBUTE);
+        Object value = parsePropertyValue(element, null);
+
+        ConstructorArgument.ValueHolder valueHolder = new ConstructorArgument.ValueHolder(value);
+        if (StringUtils.hasLength(type)) {
+            valueHolder.setType(type);
+        }
+        if (StringUtils.hasLength(name)) {
+            valueHolder.setName(name);
+        }
+        beanDefinition.getConstructorArgument().addArgumentValue(valueHolder);
     }
 
     private void parsePropertyElement(Element beanElem, BeanDefinition beanDefinition) {
@@ -73,13 +99,13 @@ public class XmlBeanDefinitionReader {
                 return;
             }
 
-            Object val = parsePropertyValue(propElem, beanDefinition, propertyName); // get the property value
+            Object val = parsePropertyValue(propElem, propertyName); // get the property value
             PropertyValue propertyValue = new PropertyValue(propertyName, val); // new a PropertyValue
             beanDefinition.getPropertyValues().add(propertyValue);
         }
     }
 
-    private Object parsePropertyValue(Element ele, BeanDefinition bd, String propertyName) {
+    private Object parsePropertyValue(Element ele, String propertyName) {
         String elementName = (propertyName != null) ?
                 "<property> element for property '" + propertyName + "'" :
                 "<constructor-arg> element";
