@@ -7,6 +7,10 @@ import java.io.InputStream;
 public class FileSystemResource implements Resource {
     private final File file;
 
+    public FileSystemResource(File file) {
+        this.file = file;
+    }
+
     public FileSystemResource(String path) {
         this.file = new File(path);
     }

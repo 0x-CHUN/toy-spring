@@ -21,4 +21,11 @@ public interface BeanDefinition {
 
     String getID();
 
+    boolean hasBeanClass();
+
+    Class<?> getBeanClass() throws IllegalStateException;
+
+    // TODO 注意ClassLoader
+    Class<?> resolveBeanClass() throws ClassNotFoundException;
+
 }

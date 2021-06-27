@@ -1,28 +1,26 @@
 package spring.beans.factory.support;
 
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import spring.beans.BeanDefinition;
 import spring.beans.PropertyValue;
 import spring.beans.SimpleTypeConverter;
 import spring.beans.factory.BeanFactory;
+import spring.beans.factory.config.BeanPostProcessor;
+import spring.beans.factory.config.ConfigurableBeanFactory;
+import spring.beans.factory.config.DependencyDescriptor;
+import spring.beans.factory.config.InstantiationAwareBeanPostProcessor;
 
 import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory, BeanDefinitionRegistry {
+public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements BeanFactory, BeanDefinitionRegistry, ConfigurableBeanFactory {
     private static final Map<String, BeanDefinition> BEAN_MAP = new ConcurrentHashMap<>();
+    private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
 
     public DefaultBeanFactory() {
     }
@@ -35,7 +33,7 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
 
         BeanDefinition definition = BEAN_MAP.get(beanId);
         if (definition.isSingleton()) {
-            Object bean = this.getSingletonObject(beanId);
+            Object bean = this.getSingleton(beanId);
             if (bean == null) {
                 bean = createBean(definition);
                 this.registerSingleton(beanId, bean);
@@ -58,22 +56,30 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
         if (definition.hasConstructorArgumentValues()) {
             ConstructorResolver resolver = new ConstructorResolver(this);
             return resolver.autowireConstructor(definition);
+        } else {
+            Class target = null;
+            try {
+                target = Thread.currentThread().getContextClassLoader().loadClass(definition.getBeanClassName());
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            try {
+                return target.getDeclaredConstructor().newInstance();
+            } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
-        Class target = null;
-        try {
-            target = Thread.currentThread().getContextClassLoader().loadClass(definition.getBeanClassName());
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
-            return target.getDeclaredConstructor().newInstance();
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     private void populateBean(BeanDefinition beanDefinition, Object bean) {
+        // inject @autowire
+        for (BeanPostProcessor processor : beanPostProcessors) {
+            if (processor instanceof InstantiationAwareBeanPostProcessor) {
+//                System.out.println("autowire " + beanDefinition.getID());
+                ((InstantiationAwareBeanPostProcessor) processor).postProcessPropertyValues(bean, beanDefinition.getID());
+            }
+        }
         // get the propertyValues from beanDefinition
         List<PropertyValue> propertyValues = beanDefinition.getPropertyValues();
 
@@ -115,5 +121,40 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
     @Override
     public void registryBeanDefinition(String beanId, BeanDefinition beanDefinition) {
         BEAN_MAP.put(beanId, beanDefinition);
+    }
+
+    @Override
+    public Object resolveDependency(DependencyDescriptor descriptor) {
+        Class<?> typeToMatch = descriptor.getDependencyType();
+        for (BeanDefinition beanDefinition : BEAN_MAP.values()) {
+            resolveBeanClass(beanDefinition);
+            Class<?> beanClass = beanDefinition.getBeanClass();
+            if (typeToMatch.isAssignableFrom(beanClass)) {
+                return this.getBean(beanDefinition.getID());
+            }
+        }
+        return null;
+    }
+
+    private void resolveBeanClass(BeanDefinition beanDefinition) {
+        if (beanDefinition.hasBeanClass()) {
+            return;
+        } else {
+            try {
+                beanDefinition.resolveBeanClass();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException("can't load class:" + beanDefinition.getBeanClassName());
+            }
+        }
+    }
+
+    @Override
+    public void addBeanPostProcessor(BeanPostProcessor postProcessor) {
+        this.beanPostProcessors.add(postProcessor);
+    }
+
+    @Override
+    public List<BeanPostProcessor> getBeanPostProcessors() {
+        return this.beanPostProcessors;
     }
 }

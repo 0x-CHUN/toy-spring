@@ -23,7 +23,7 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
     }
 
     @Override
-    public Object getSingletonObject(String beanId) {
+    public Object getSingleton(String beanId) {
         return this.singletonObjects.get(beanId);
     }
 }

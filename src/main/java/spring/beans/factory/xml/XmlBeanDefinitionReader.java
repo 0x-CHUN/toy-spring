@@ -7,6 +7,7 @@ import spring.beans.BeanDefinition;
 import spring.beans.ConstructorArgument;
 import spring.beans.PropertyValue;
 import spring.beans.ScopeType;
+import spring.beans.factory.annotation.ClassPathBeanDefinitionScanner;
 import spring.beans.factory.config.RuntimeBeanReference;
 import spring.beans.factory.config.TypedStringValue;
 import spring.beans.factory.support.BeanDefinitionRegistry;
@@ -48,23 +49,47 @@ public class XmlBeanDefinitionReader {
             List<Element> elements = root.elements();
             BeanDefinition beanDefinition;
             for (Element element : elements) {
-                beanDefinition = new GenericBeanDefinition(element.attribute("id").getValue(),
-                        element.attribute("class").getValue());
-                if (element.attribute("scope") != null) {
-                    //todo: check scope format
-                    beanDefinition.setScope(ScopeType.getType(element.attribute("scope").getValue()));
+                String namespaceUri = element.getNamespaceURI();
+                if (this.isDefaultNamespace(namespaceUri)) {
+                    // normal bean
+                    parseDefaultElement(element);
+                } else if (this.isContextNamespace(namespaceUri)) {
+                    parseComponentElement(element);
                 }
-                // inject constructor
-                parseConstructorArgElements(element, beanDefinition);
-                // inject value of element into bean
-                parsePropertyElement(element, beanDefinition);
-                registry.registryBeanDefinition(element.attribute("id").getValue(), beanDefinition);
             }
         } catch (Exception e) {
             // todo: exception
             throw new RuntimeException("parse bean definition file error", e);
         }
     }
+
+    private void parseComponentElement(Element element) {
+        String basePackages = element.attributeValue(BASE_PACKAGE_ATTRIBUTE);
+        ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(registry);
+        scanner.doScan(basePackages);
+    }
+
+    private void parseDefaultElement(Element element) {
+        BeanDefinition beanDefinition = new GenericBeanDefinition(element.attribute(ID_ATTRIBUTE).getValue(),
+                element.attribute(CLASS_ATTRIBUTE).getValue());
+        if (element.attribute(SCOPE_ATTRIBUTE) != null) {
+            beanDefinition.setScope(ScopeType.getType(element.attribute(SCOPE_ATTRIBUTE).getValue()));
+        }
+        // inject constructor
+        parseConstructorArgElements(element, beanDefinition);
+        // inject value of element into bean
+        parsePropertyElement(element, beanDefinition);
+        registry.registryBeanDefinition(element.attribute(ID_ATTRIBUTE).getValue(), beanDefinition);
+    }
+
+    public boolean isDefaultNamespace(String namespaceUri) {
+        return (!StringUtils.hasLength(namespaceUri) || BEANS_NAMESPACE_URI.equals(namespaceUri));
+    }
+
+    public boolean isContextNamespace(String namespaceUri) {
+        return (!StringUtils.hasLength(namespaceUri) || CONTEXT_NAMESPACE_URI.equals(namespaceUri));
+    }
+
 
     private void parseConstructorArgElements(Element element, BeanDefinition beanDefinition) {
         Iterator iterator = element.elementIterator(CONSTRUCTOR_ARG_ELEMENT);

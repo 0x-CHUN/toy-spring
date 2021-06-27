@@ -10,13 +10,11 @@ public abstract class ReflectionUtils {
 
     /**
      * Naming prefix for CGLIB-renamed methods.
-     *
      */
     private static final String CGLIB_RENAMED_METHOD_PREFIX = "CGLIB$";
 
     /**
      * Pattern for detecting CGLIB-renamed methods.
-     *
      */
     private static final Pattern CGLIB_RENAMED_METHOD_PATTERN = Pattern.compile("(.+)\\$\\d+");
 

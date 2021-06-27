@@ -11,6 +11,7 @@ import java.util.List;
 public class GenericBeanDefinition implements BeanDefinition {
     private String beanId;
     private String beanClassName;
+    private Class<?> beanClass;
 
     private ScopeType scopeType = ScopeType.DEFAULT;
     private List<PropertyValue> propertyValues = new ArrayList<>();
@@ -21,10 +22,14 @@ public class GenericBeanDefinition implements BeanDefinition {
         this.beanClassName = beanClassName;
     }
 
+    public GenericBeanDefinition() {
+    }
+
     @Override
     public String getBeanClassName() {
         return this.beanClassName;
     }
+
 
     @Override
     public boolean isSingleton() {
@@ -64,5 +69,37 @@ public class GenericBeanDefinition implements BeanDefinition {
     @Override
     public String getID() {
         return this.beanId;
+    }
+
+    @Override
+    public boolean hasBeanClass() {
+        return this.beanClass != null;
+    }
+
+    @Override
+    public Class<?> getBeanClass() throws IllegalStateException {
+        if (this.beanClass == null) {
+            throw new IllegalStateException(
+                    "Bean class name [" + this.getBeanClassName() + "] has not been resolved into an actual Class");
+        }
+        return this.beanClass;
+    }
+
+    @Override
+    public Class<?> resolveBeanClass() throws ClassNotFoundException {
+        String className = getBeanClassName();
+        if (className == null)
+            return null;
+        Class<?> resolvedClass = Thread.currentThread().getContextClassLoader().loadClass(className);
+        this.beanClass = resolvedClass;
+        return resolvedClass;
+    }
+
+    public void setBeanClassName(String beanClassName) {
+        this.beanClassName = beanClassName;
+    }
+
+    public void setBeanId(String beanId) {
+        this.beanId = beanId;
     }
 }
