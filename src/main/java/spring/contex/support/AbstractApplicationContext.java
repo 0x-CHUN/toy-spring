@@ -27,4 +27,9 @@ public abstract class AbstractApplicationContext implements ApplicationContext {
     public Object getBean(String beanId) {
         return factory.getBean(beanId);
     }
+
+    @Override
+    public Class<?> getType(String name) {
+        return this.factory.getType(name);
+    }
 }

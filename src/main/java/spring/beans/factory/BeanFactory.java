@@ -8,4 +8,12 @@ public interface BeanFactory {
      * @return object
      */
     Object getBean(String beanId);
+
+    /**
+     * Get type
+     *
+     * @param name
+     * @return Class<?>
+     */
+    Class<?> getType(String name);
 }

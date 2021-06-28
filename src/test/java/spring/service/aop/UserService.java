@@ -1,4 +1,4 @@
-package spring.service.cglib;
+package spring.service.aop;
 
 import spring.beans.factory.annotation.Autowired;
 import spring.dao.AccountDao;

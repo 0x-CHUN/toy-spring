@@ -43,6 +43,16 @@ public class DefaultBeanFactory extends DefaultSingletonBeanRegistry implements 
         return createBean(definition);
     }
 
+    @Override
+    public Class<?> getType(String name) {
+        BeanDefinition beanDefinition = BEAN_MAP.get(name);
+        if (beanDefinition == null) {
+            throw new RuntimeException(name);
+        }
+        resolveBeanClass(beanDefinition);
+        return beanDefinition.getBeanClass();
+    }
+
     private Object createBean(BeanDefinition beanDefinition) {
         // init bean
         Object bean = instantiateBean(beanDefinition);

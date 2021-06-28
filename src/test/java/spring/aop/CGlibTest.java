@@ -4,7 +4,7 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 import org.junit.Test;
-import spring.service.cglib.UserService;
+import spring.service.aop.UserService;
 import spring.transaction.TransactionManager;
 
 import java.lang.reflect.Method;
