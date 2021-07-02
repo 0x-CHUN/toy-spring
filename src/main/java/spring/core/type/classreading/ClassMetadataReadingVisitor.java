@@ -7,6 +7,7 @@ import spring.core.type.ClassMetadata;
 import static spring.util.ClassUtils.convertResourcePathToClassName;
 
 public class ClassMetadataReadingVisitor extends ClassVisitor implements ClassMetadata {
+
     private String className;
 
     private boolean isInterface;
@@ -19,9 +20,11 @@ public class ClassMetadataReadingVisitor extends ClassVisitor implements ClassMe
 
     private String[] interfaces;
 
+
     public ClassMetadataReadingVisitor() {
         // TODO
         super(327680);
+
     }
 
     @Override
@@ -39,6 +42,7 @@ public class ClassMetadataReadingVisitor extends ClassVisitor implements ClassMe
         }
     }
 
+
     @Override
     public String getClassName() {
         return this.className;
@@ -54,14 +58,19 @@ public class ClassMetadataReadingVisitor extends ClassVisitor implements ClassMe
         return this.isAbstract;
     }
 
+    public boolean isConcrete() {
+        return !(this.isInterface || this.isAbstract);
+    }
+
     @Override
     public boolean isFinal() {
         return this.isFinal;
     }
 
+
     @Override
     public boolean hasSuperClass() {
-        return this.superClassName != null;
+        return (this.superClassName != null);
     }
 
     @Override
@@ -73,4 +82,6 @@ public class ClassMetadataReadingVisitor extends ClassVisitor implements ClassMe
     public String[] getInterfaceNames() {
         return this.interfaces;
     }
+
+
 }

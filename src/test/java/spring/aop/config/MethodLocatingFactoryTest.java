@@ -1,6 +1,5 @@
 package spring.aop.config;
 
-import org.junit.Assert;
 import org.junit.Test;
 import spring.beans.factory.support.DefaultBeanFactory;
 import spring.beans.factory.xml.XmlBeanDefinitionReader;
@@ -23,11 +22,8 @@ public class MethodLocatingFactoryTest {
         methodLocatingFactory.setTargetBeanName("tx");
         methodLocatingFactory.setMethodName("start");
         methodLocatingFactory.setBeanFactory(beanFactory);
-
-        Method method = methodLocatingFactory.getMethod();
-
+        Method method = methodLocatingFactory.getObject();
         assertNotNull(method);
-
         assertEquals(TransactionManager.class, method.getDeclaringClass());
         assertEquals(method, TransactionManager.class.getMethod("start"));
     }

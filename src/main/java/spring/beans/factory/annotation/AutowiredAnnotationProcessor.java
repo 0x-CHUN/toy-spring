@@ -37,7 +37,6 @@ public class AutowiredAnnotationProcessor implements InstantiationAwareBeanPostP
                 Annotation ann = findAutowiredAnnotation(field);
                 if (ann != null) {
                     if (Modifier.isStatic(field.getModifiers())) {
-
                         continue;
                     }
                     boolean required = determineRequiredStatus(ann);

@@ -3,80 +3,64 @@ package spring.beans.factory.support;
 import spring.beans.BeanDefinition;
 import spring.beans.ConstructorArgument;
 import spring.beans.PropertyValue;
-import spring.beans.ScopeType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GenericBeanDefinition implements BeanDefinition {
-    private String beanId;
+    private String id;
     private String beanClassName;
     private Class<?> beanClass;
+    private boolean singleton = true;
+    private boolean prototype = false;
+    private String scope = SCOPE_DEFAULT;
 
-    private ScopeType scopeType = ScopeType.DEFAULT;
-    private List<PropertyValue> propertyValues = new ArrayList<>();
+    List<PropertyValue> propertyValues = new ArrayList<>();
     private ConstructorArgument constructorArgument = new ConstructorArgument();
+    private boolean isSynthetic = false;
 
-    public GenericBeanDefinition(String beanId, String beanClassName) {
-        this.beanId = beanId;
+    public GenericBeanDefinition(String id, String beanClassName) {
+
+        this.id = id;
         this.beanClassName = beanClassName;
     }
 
-    public GenericBeanDefinition() {
+    public GenericBeanDefinition(Class<?> clz) {
+        this.beanClass = clz;
+        this.beanClassName = clz.getName();
     }
 
-    @Override
+    public GenericBeanDefinition() {
+
+    }
+
+    public boolean isSynthetic() {
+        return isSynthetic;
+    }
+
+    public void setSynthetic(boolean isSynthetic) {
+        this.isSynthetic = isSynthetic;
+    }
+
     public String getBeanClassName() {
+
         return this.beanClassName;
     }
 
-
-    @Override
-    public boolean isSingleton() {
-        return this.scopeType.equals(ScopeType.SINGLETON) || this.scopeType.equals(ScopeType.DEFAULT);
+    public void setBeanClassName(String className) {
+        this.beanClassName = className;
     }
 
-    @Override
-    public boolean isPrototype() {
-        return this.scopeType.equals(ScopeType.PROTOTYPE);
+    public Class<?> resolveBeanClass() throws ClassNotFoundException {
+        String className = getBeanClassName();
+        if (className == null) {
+            return null;
+        }
+        Class<?> resolvedClass = Thread.currentThread().getContextClassLoader().loadClass(className);
+        this.beanClass = resolvedClass;
+        return resolvedClass;
     }
 
-    @Override
-    public ScopeType getScope() {
-        return this.scopeType;
-    }
-
-    @Override
-    public void setScope(ScopeType scopeType) {
-        this.scopeType = scopeType;
-    }
-
-    @Override
-    public List<PropertyValue> getPropertyValues() {
-        return this.propertyValues;
-    }
-
-    @Override
-    public ConstructorArgument getConstructorArgument() {
-        return this.constructorArgument;
-    }
-
-    @Override
-    public boolean hasConstructorArgumentValues() {
-        return !this.constructorArgument.isEmpty();
-    }
-
-    @Override
-    public String getID() {
-        return this.beanId;
-    }
-
-    @Override
-    public boolean hasBeanClass() {
-        return this.beanClass != null;
-    }
-
-    @Override
     public Class<?> getBeanClass() throws IllegalStateException {
         if (this.beanClass == null) {
             throw new IllegalStateException(
@@ -85,21 +69,46 @@ public class GenericBeanDefinition implements BeanDefinition {
         return this.beanClass;
     }
 
-    @Override
-    public Class<?> resolveBeanClass() throws ClassNotFoundException {
-        String className = getBeanClassName();
-        if (className == null)
-            return null;
-        Class<?> resolvedClass = Thread.currentThread().getContextClassLoader().loadClass(className);
-        this.beanClass = resolvedClass;
-        return resolvedClass;
+    public boolean hasBeanClass() {
+        return this.beanClass != null;
     }
 
-    public void setBeanClassName(String beanClassName) {
-        this.beanClassName = beanClassName;
+    public boolean isSingleton() {
+        return this.singleton;
     }
 
-    public void setBeanId(String beanId) {
-        this.beanId = beanId;
+    public boolean isPrototype() {
+        return this.prototype;
+    }
+
+    public String getScope() {
+        return this.scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
+        this.singleton = SCOPE_SINGLETON.equals(scope) || SCOPE_DEFAULT.equals(scope);
+        this.prototype = SCOPE_PROTOTYPE.equals(scope);
+
+    }
+
+    public List<PropertyValue> getPropertyValues() {
+        return this.propertyValues;
+    }
+
+    public ConstructorArgument getConstructorArgument() {
+        return this.constructorArgument;
+    }
+
+    public String getID() {
+        return this.id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public boolean hasConstructorArgumentValues() {
+        return !this.constructorArgument.isEmpty();
     }
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 import static java.lang.String.format;
 
 public class AnnotationAttributes extends LinkedHashMap<String, Object> {
+
     public AnnotationAttributes() {
     }
 
@@ -18,7 +19,6 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
     public AnnotationAttributes(Map<String, Object> map) {
         super(map);
     }
-
 
     public String getString(String attributeName) {
         return doGet(attributeName, String.class);
@@ -32,17 +32,14 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
         return doGet(attributeName, Boolean.class);
     }
 
-    @SuppressWarnings("unchecked")
     public <N extends Number> N getNumber(String attributeName) {
         return (N) doGet(attributeName, Integer.class);
     }
 
-    @SuppressWarnings("unchecked")
     public <E extends Enum<?>> E getEnum(String attributeName) {
         return (E) doGet(attributeName, Enum.class);
     }
 
-    @SuppressWarnings("unchecked")
     public <T> Class<? extends T> getClass(String attributeName) {
         return doGet(attributeName, Class.class);
     }
@@ -52,12 +49,9 @@ public class AnnotationAttributes extends LinkedHashMap<String, Object> {
     }
 
 
-    @SuppressWarnings("unchecked")
     private <T> T doGet(String attributeName, Class<T> expectedType) {
-
         Object value = this.get(attributeName);
         Assert.notNull(value, format("Attribute '%s' not found", attributeName));
         return (T) value;
     }
-
 }

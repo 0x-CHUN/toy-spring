@@ -1,13 +1,11 @@
 package spring.service.aop;
 
 import spring.beans.factory.annotation.Autowired;
-import spring.dao.AccountDao;
-import spring.dao.ItemDao;
 import spring.stereotype.Component;
 import spring.util.MessageTracker;
 
 @Component(value = "userService")
-public class UserService {
+public class UserService{
     @Autowired
     private AccountDao accountDao;
     @Autowired
@@ -29,7 +27,7 @@ public class UserService {
         MessageTracker.addMsg("place order");
     }
 
-    public void placeOrderWithException(){
+    public void placeOrderWithException() {
         throw new NullPointerException();
     }
 }

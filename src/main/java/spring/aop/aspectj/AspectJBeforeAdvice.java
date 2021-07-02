@@ -1,19 +1,20 @@
 package spring.aop.aspectj;
 
 import org.aopalliance.intercept.MethodInvocation;
+import spring.aop.config.AspectInstanceFactory;
 
 import java.lang.reflect.Method;
 
 public class AspectJBeforeAdvice extends AbstractAspectJAdvice {
 
-    public AspectJBeforeAdvice(Method adviceMethod, AspectJExpressionPointcut pointcut, Object adviceObject) {
-        super(adviceMethod, pointcut, adviceObject);
+    public AspectJBeforeAdvice(Method adviceMethod, AspectJExpressionPointcut pointcut, AspectInstanceFactory adviceObjectFactory) {
+        super(adviceMethod, pointcut, adviceObjectFactory);
     }
 
-    @Override
     public Object invoke(MethodInvocation methodInvocation) throws Throwable {
         this.invokeAdviceMethod();
-        Object object = methodInvocation.proceed();
-        return object;
+        return methodInvocation.proceed();
     }
+
+
 }

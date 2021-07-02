@@ -12,11 +12,12 @@ public class DependencyDescriptor {
         Assert.notNull(field, "Field must not be null");
         this.field = field;
         this.required = required;
+
     }
 
     public Class<?> getDependencyType() {
         if (this.field != null) {
-            return this.field.getType();
+            return field.getType();
         }
         throw new RuntimeException("only support field dependency");
     }

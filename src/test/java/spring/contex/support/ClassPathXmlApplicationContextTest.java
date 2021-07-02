@@ -1,7 +1,8 @@
 package spring.contex.support;
 
 import org.junit.Test;
-import spring.contex.ApplicationContext;
+import spring.context.ApplicationContext;
+import spring.context.support.ClassPathXmlApplicationContext;
 import spring.service.UserService;
 import spring.service.ItemService;
 

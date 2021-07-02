@@ -1,6 +1,5 @@
 package spring.stereotype;
 
-
 import java.lang.annotation.*;
 
 @Target(ElementType.TYPE)
@@ -8,4 +7,5 @@ import java.lang.annotation.*;
 @Documented
 public @interface Component {
     String value() default "";
+
 }

@@ -33,25 +33,45 @@ public class AspectJExpressionPointcut implements Pointcut, MethodMatcher {
 
     private PointcutExpression pointcutExpression;
 
-    private ClassLoader classLoader;
-
-
     public AspectJExpressionPointcut() {
+
     }
 
     @Override
-    public boolean matches(Method method) {
+    public MethodMatcher getMethodMatcher() {
+
+        return this;
+    }
+
+    @Override
+    public String getExpression() {
+
+        return this.expression;
+    }
+
+    public void setExpression(String expression) {
+        this.expression = expression;
+    }
+
+    @Override
+    public boolean matches(Method method/*, Class<?> targetClass*/) {
+
         checkReadyToMatch();
+
         ShadowMatch shadowMatch = getShadowMatch(method);
+
         return shadowMatch.alwaysMatches();
     }
 
     private ShadowMatch getShadowMatch(Method method) {
+
         ShadowMatch shadowMatch;
         try {
             shadowMatch = this.pointcutExpression.matchesMethodExecution(method);
         } catch (ReflectionWorld.ReflectionWorldException ex) {
+
             throw new RuntimeException("not implemented yet");
+
         }
         return shadowMatch;
     }
@@ -61,37 +81,27 @@ public class AspectJExpressionPointcut implements Pointcut, MethodMatcher {
             throw new IllegalStateException("Must set property 'expression' before attempting to match");
         }
         if (this.pointcutExpression == null) {
-            this.classLoader = ClassUtils.getDefaultClassLoader();
-            this.pointcutExpression = buildPointcutExpression(this.classLoader);
+            ClassLoader pointcutClassLoader = ClassUtils.getDefaultClassLoader();
+            this.pointcutExpression = buildPointcutExpression(pointcutClassLoader);
         }
     }
 
     private PointcutExpression buildPointcutExpression(ClassLoader classLoader) {
-        PointcutParser parser = PointcutParser.getPointcutParserSupportingSpecifiedPrimitivesAndUsingSpecifiedClassLoaderForResolution(
-                SUPPORTED_PRIMITIVES,
-                classLoader
-        );
-        return parser.parsePointcutExpression(replaceBooleanOperators(expression), null, new PointcutParameter[0]);
+
+
+        PointcutParser parser = PointcutParser
+                .getPointcutParserSupportingSpecifiedPrimitivesAndUsingSpecifiedClassLoaderForResolution(
+                        SUPPORTED_PRIMITIVES, classLoader);
+
+        return parser.parsePointcutExpression(replaceBooleanOperators(getExpression()),
+                null, new PointcutParameter[0]);
     }
 
-    private String replaceBooleanOperators(String expression) {
-        String result = replace(expression, " and ", " && ");
+
+    private String replaceBooleanOperators(String pcExpr) {
+        String result = replace(pcExpr, " and ", " && ");
         result = replace(result, " or ", " || ");
         result = replace(result, " not ", " ! ");
         return result;
-    }
-
-    @Override
-    public MethodMatcher getMethodMatcher() {
-        return this;
-    }
-
-    @Override
-    public String getExpression() {
-        return this.expression;
-    }
-
-    public void setExpression(String expression){
-        this.expression = expression;
     }
 }

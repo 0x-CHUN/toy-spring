@@ -6,6 +6,7 @@ import spring.util.StringUtils;
 import java.beans.PropertyEditorSupport;
 import java.text.NumberFormat;
 
+
 public class CustomNumberEditor extends PropertyEditorSupport {
     private final Class<? extends Number> numberClass;
 
@@ -32,13 +33,10 @@ public class CustomNumberEditor extends PropertyEditorSupport {
     @Override
     public void setAsText(String text) throws IllegalArgumentException {
         if (this.allowEmpty && !StringUtils.hasText(text)) {
-            // Treat empty String as null value.
             setValue(null);
         } else if (this.numberFormat != null) {
-            // Use given NumberFormat for parsing text.
             setValue(NumberUtils.parseNumber(text, this.numberClass, this.numberFormat));
         } else {
-            // Use default valueOf methods for parsing text.
             setValue(NumberUtils.parseNumber(text, this.numberClass));
         }
     }
@@ -52,7 +50,6 @@ public class CustomNumberEditor extends PropertyEditorSupport {
         }
     }
 
-
     @Override
     public String getAsText() {
         Object value = getValue();
@@ -60,10 +57,8 @@ public class CustomNumberEditor extends PropertyEditorSupport {
             return "";
         }
         if (this.numberFormat != null) {
-            // Use NumberFormat for rendering value.
             return this.numberFormat.format(value);
         } else {
-            // Use toString method for rendering value.
             return value.toString();
         }
     }

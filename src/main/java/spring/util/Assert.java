@@ -1,9 +1,9 @@
 package spring.util;
 
 public abstract class Assert {
-    public static void notNull(Object object, String msg) {
+    public static void notNull(Object object, String message) {
         if (object == null) {
-            throw new IllegalArgumentException(msg);
+            throw new IllegalArgumentException(message);
         }
     }
 }

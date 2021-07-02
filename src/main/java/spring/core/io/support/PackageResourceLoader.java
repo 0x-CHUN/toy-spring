@@ -6,33 +6,31 @@ import spring.util.Assert;
 import spring.util.ClassUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class PackageResourceLoader {
-
     public PackageResourceLoader() {
     }
 
-    public Resource[] getResources(String basePackage) {
-        Assert.notNull(basePackage, "base package must not be null");
+    public Resource[] getResources(String basePackage) throws IOException {
+        Assert.notNull(basePackage, "basePackage  must not be null");
         String location = ClassUtils.convertClassNameToResourcePath(basePackage);
-
         URL url = Thread.currentThread().getContextClassLoader().getResource(location);
         File rootDir = new File(url.getFile());
-
         Set<File> matchingFiles = retrieveMatchingFiles(rootDir);
-        Resource[] resources = new Resource[matchingFiles.size()];
+        Resource[] result = new Resource[matchingFiles.size()];
         int i = 0;
         for (File file : matchingFiles) {
-            resources[i++] = new FileSystemResource(file);
+            result[i++] = new FileSystemResource(file);
         }
-        return resources;
+        return result;
     }
 
-    private Set<File> retrieveMatchingFiles(File rootDir) {
+    protected Set<File> retrieveMatchingFiles(File rootDir) throws IOException {
         if (!rootDir.exists()) {
             return Collections.emptySet();
         }
@@ -42,19 +40,19 @@ public class PackageResourceLoader {
         if (!rootDir.canRead()) {
             return Collections.emptySet();
         }
-        Set<File> result = new LinkedHashSet<>();
+        Set<File> result = new LinkedHashSet<>(8);
         doRetrieveMatchingFiles(rootDir, result);
         return result;
     }
 
-    private void doRetrieveMatchingFiles(File rootDir, Set<File> result) {
-        File[] dirContents = rootDir.listFiles();
-        if (dirContents == null)
+    protected void doRetrieveMatchingFiles(File dir, Set<File> result) {
+        File[] dirContents = dir.listFiles();
+        if (dirContents == null) {
             return;
+        }
         for (File content : dirContents) {
             if (content.isDirectory()) {
-                if (!content.canRead()) {
-                } else {
+                if (content.canRead()) {
                     doRetrieveMatchingFiles(content, result);
                 }
             } else {

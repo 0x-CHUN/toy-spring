@@ -54,3 +54,4 @@ public class CustomBooleanEditor extends PropertyEditorSupport {
         }
     }
 }
+

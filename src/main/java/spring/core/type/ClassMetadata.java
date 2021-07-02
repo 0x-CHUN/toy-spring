@@ -1,6 +1,7 @@
 package spring.core.type;
 
 public interface ClassMetadata {
+
     String getClassName();
 
     boolean isInterface();

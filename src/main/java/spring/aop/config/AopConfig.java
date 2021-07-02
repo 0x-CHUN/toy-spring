@@ -14,13 +14,17 @@ public interface AopConfig {
 
     Class<?>[] getProxiedInterfaces();
 
-    boolean isInterfaceProxied(Class<?> interf);
+
+    boolean isInterfaceProxied(Class<?> intf);
+
 
     List<Advice> getAdvices();
+
 
     void addAdvice(Advice advice);
 
     List<Advice> getAdvices(Method method);
 
     void setTargetObject(Object obj);
+
 }

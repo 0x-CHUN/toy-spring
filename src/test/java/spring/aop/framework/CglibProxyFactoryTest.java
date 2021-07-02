@@ -6,43 +6,48 @@ import spring.aop.aspectj.AspectJAfterReturningAdvice;
 import spring.aop.aspectj.AspectJBeforeAdvice;
 import spring.aop.aspectj.AspectJExpressionPointcut;
 import spring.aop.config.AopConfig;
+import spring.aop.config.AspectInstanceFactory;
+import spring.beans.factory.BeanFactory;
+import spring.contex.support.AbstractApplicationContextTest;
 import spring.service.aop.UserService;
 import spring.transaction.TransactionManager;
 import spring.util.MessageTracker;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class CglibProxyFactoryTest {
-    private static AspectJBeforeAdvice beforeAdvice = null;
-    private static AspectJAfterReturningAdvice afterAdvice = null;
+public class CglibProxyFactoryTest extends AbstractApplicationContextTest {
+    private AspectJBeforeAdvice beforeAdvice = null;
+    private AspectJAfterReturningAdvice afterAdvice = null;
+    private AspectJExpressionPointcut pointcut = null;
+    private BeanFactory factory = null;
+    private AspectInstanceFactory aspectInstanceFactory = null;
 
     @Before
-    public void setup() throws Exception {
+    public void setup() throws NoSuchMethodException {
         MessageTracker.clearMsgs();
-
-        TransactionManager transactionManager = new TransactionManager();
         String expression = "execution(* spring.service.aop.*.placeOrder(..))";
-        AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
+        pointcut = new AspectJExpressionPointcut();
         pointcut.setExpression(expression);
 
+        factory = this.getBeanFactory("bean-v5.xml");
+        aspectInstanceFactory = this.getAspectInstanceFactory("tx");
+        aspectInstanceFactory.setBeanFactory(factory);
         beforeAdvice = new AspectJBeforeAdvice(
                 TransactionManager.class.getMethod("start"),
                 pointcut,
-                transactionManager);
+                aspectInstanceFactory);
 
         afterAdvice = new AspectJAfterReturningAdvice(
                 TransactionManager.class.getMethod("commit"),
                 pointcut,
-                transactionManager);
-
+                aspectInstanceFactory);
     }
 
 
     @Test
-    public void testGetProxy() throws AopConfigException {
+    public void testGetProxy() {
         AopConfig config = new AopConfigSupport();
         config.addAdvice(beforeAdvice);
         config.addAdvice(afterAdvice);

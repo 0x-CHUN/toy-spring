@@ -22,15 +22,15 @@ public class AutowiredFieldElement extends InjectionElement {
     public void inject(Object target) {
         Field field = getField();
         try {
-            DependencyDescriptor descriptor = new DependencyDescriptor(field, this.required);
-            Object value = this.factory.resolveDependency(descriptor);
+            DependencyDescriptor desc = new DependencyDescriptor(field, this.required);
+            Object value = factory.resolveDependency(desc);
             if (value != null) {
                 ReflectionUtils.makeAccessible(field);
                 field.set(target, value);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Throwable ex) {
             throw new RuntimeException("Could not autowire field: " + field);
         }
     }
+
 }

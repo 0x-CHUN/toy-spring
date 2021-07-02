@@ -1,7 +1,7 @@
 package spring.beans.factory.config;
 
 public interface SingletonBeanRegistry {
-    void registerSingleton(String beanId, Object singletonObject);
+    void registerSingleton(String beanName, Object singletonObject);
 
-    Object getSingleton(String beanId);
+    Object getSingleton(String beanName);
 }

@@ -14,10 +14,11 @@ public class InjectionMetadata {
     }
 
     public void inject(Object target) {
-        if (injectionElements == null || injectionElements.isEmpty())
+        if (injectionElements == null || injectionElements.isEmpty()) {
             return;
-        for (InjectionElement element : injectionElements) {
-            element.inject(target);
+        }
+        for (InjectionElement ele : injectionElements) {
+            ele.inject(target);
         }
     }
 }

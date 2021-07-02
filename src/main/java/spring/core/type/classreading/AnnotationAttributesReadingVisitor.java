@@ -6,6 +6,7 @@ import spring.beans.factory.annotation.AnnotationAttributes;
 import java.util.Map;
 
 public class AnnotationAttributesReadingVisitor extends AnnotationVisitor {
+
     private final String annotationType;
 
     private final Map<String, AnnotationAttributes> attributesMap;
@@ -14,12 +15,9 @@ public class AnnotationAttributesReadingVisitor extends AnnotationVisitor {
 
 
     public AnnotationAttributesReadingVisitor(String annotationType, Map<String, AnnotationAttributes> attributesMap) {
-        // TODO
-        //super(SpringAsmInfo.ASM_VERSION);
         super(327680);
         this.annotationType = annotationType;
         this.attributesMap = attributesMap;
-
     }
 
     @Override
@@ -31,5 +29,4 @@ public class AnnotationAttributesReadingVisitor extends AnnotationVisitor {
     public void visit(String attributeName, Object attributeValue) {
         this.attributes.put(attributeName, attributeValue);
     }
-
 }

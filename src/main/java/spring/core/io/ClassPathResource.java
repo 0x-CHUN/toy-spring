@@ -1,21 +1,17 @@
 package spring.core.io;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 public class ClassPathResource implements Resource {
-    private String path;
+    private final String path;
 
     public ClassPathResource(String path) {
         this.path = path;
     }
 
     @Override
-    public InputStream getInputStream() throws Exception {
-        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(this.path);
-        if (inputStream == null) {
-            throw new FileNotFoundException(path + " cannot be opened");
-        }
-        return inputStream;
+    public InputStream getInputStream() {
+        return Thread.currentThread().getContextClassLoader().getResourceAsStream(this.path);
     }
 }

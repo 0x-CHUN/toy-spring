@@ -2,28 +2,27 @@ package spring.beans.factory.support;
 
 import spring.beans.factory.config.SingletonBeanRegistry;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
-    private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>();
-
+    private final Map<String, Object> singletonObjects = new HashMap<>();
 
     @Override
-    public void registerSingleton(String beanId, Object singletonObject) {
-        if (beanId == null || beanId.trim().equals("")) {
-            throw new RuntimeException("bean name null error");
+    public void registerSingleton(String beanName, Object singletonObject) {
+        if (null == beanName || "".equals(beanName.trim())) {
+            throw new RuntimeException("beanName null error");
         }
-        Object oldObject = this.singletonObjects.get(beanId);
+        Object oldObject = this.singletonObjects.get(beanName);
         if (oldObject != null) {
             throw new IllegalStateException("Could not register object [" + singletonObject +
-                    "] under bean name '" + beanId + "': there is already object [" + oldObject + "] bound");
+                    "] under bean name '" + beanName + "': there is already object [" + oldObject + "] bound");
         }
-        this.singletonObjects.put(beanId, singletonObject);
+        this.singletonObjects.put(beanName, singletonObject);
     }
 
     @Override
-    public Object getSingleton(String beanId) {
-        return this.singletonObjects.get(beanId);
+    public Object getSingleton(String beanName) {
+        return this.singletonObjects.get(beanName);
     }
 }

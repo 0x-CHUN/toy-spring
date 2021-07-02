@@ -1,13 +1,18 @@
 package spring.beans;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 public class ConstructorArgument {
-
     private final List<ValueHolder> argumentValues = new LinkedList<>();
 
     public ConstructorArgument() {
+    }
+
+
+    public void addArgumentValue(Object value) {
+        this.argumentValues.add(new ValueHolder(value));
     }
 
     public void addArgumentValue(ValueHolder valueHolder) {
@@ -15,7 +20,7 @@ public class ConstructorArgument {
     }
 
     public List<ValueHolder> getArgumentValues() {
-        return this.argumentValues;
+        return Collections.unmodifiableList(this.argumentValues);
     }
 
     public int getArgumentCount() {
@@ -26,7 +31,7 @@ public class ConstructorArgument {
         return this.argumentValues.isEmpty();
     }
 
-    public void clear(){
+    public void clear() {
         this.argumentValues.clear();
     }
 
@@ -45,28 +50,23 @@ public class ConstructorArgument {
             this.type = type;
         }
 
-
         public ValueHolder(Object value, String type, String name) {
             this.value = value;
             this.type = type;
             this.name = name;
         }
 
-
         public void setValue(Object value) {
             this.value = value;
         }
-
 
         public Object getValue() {
             return this.value;
         }
 
-
         public void setType(String type) {
             this.type = type;
         }
-
 
         public String getType() {
             return this.type;

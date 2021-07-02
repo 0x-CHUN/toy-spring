@@ -2,16 +2,23 @@ package spring.aop.config;
 
 import spring.beans.BeanUtils;
 import spring.beans.factory.BeanFactory;
+import spring.beans.factory.BeanFactoryAware;
+import spring.beans.factory.FactoryBean;
 import spring.util.StringUtils;
 
 import java.lang.reflect.Method;
 
-public class MethodLocatingFactory {
+public class MethodLocatingFactory implements FactoryBean<Method>, BeanFactoryAware {
     private String targetBeanName;
     private String methodName;
     private Method method;
 
-    public MethodLocatingFactory() {
+    public void setTargetBeanName(String targetBeanName) {
+        this.targetBeanName = targetBeanName;
+    }
+
+    public void setMethodName(String methodName) {
+        this.methodName = methodName;
     }
 
     public void setBeanFactory(BeanFactory beanFactory) {
@@ -33,27 +40,12 @@ public class MethodLocatingFactory {
     }
 
 
-    public String getTargetBeanName() {
-        return targetBeanName;
+    public Method getObject() throws Exception {
+        return this.method;
     }
 
-    public void setTargetBeanName(String targetBeanName) {
-        this.targetBeanName = targetBeanName;
-    }
-
-    public String getMethodName() {
-        return methodName;
-    }
-
-    public void setMethodName(String methodName) {
-        this.methodName = methodName;
-    }
-
-    public Method getMethod() {
-        return method;
-    }
-
-    public void setMethod(Method method) {
-        this.method = method;
+    @Override
+    public Class<?> getObjectType() {
+        return Method.class;
     }
 }

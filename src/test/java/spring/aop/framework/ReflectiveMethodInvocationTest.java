@@ -6,6 +6,9 @@ import org.junit.Test;
 import spring.aop.aspectj.AspectJAfterReturningAdvice;
 import spring.aop.aspectj.AspectJAfterThrowingAdvice;
 import spring.aop.aspectj.AspectJBeforeAdvice;
+import spring.aop.config.AspectInstanceFactory;
+import spring.beans.factory.BeanFactory;
+import spring.contex.support.AbstractApplicationContextTest;
 import spring.service.aop.UserService;
 import spring.transaction.TransactionManager;
 import spring.util.MessageTracker;
@@ -16,12 +19,14 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class ReflectiveMethodInvocationTest {
+public class ReflectiveMethodInvocationTest extends AbstractApplicationContextTest {
     private AspectJBeforeAdvice beforeAdvice = null;
     private AspectJAfterReturningAdvice afterAdvice = null;
     private AspectJAfterThrowingAdvice afterThrowingAdvice = null;
     private UserService service = null;
     private TransactionManager transactionManager;
+    private BeanFactory beanFactory = null;
+    private AspectInstanceFactory aspectInstanceFactory = null;
 
     @Before
     public void setUp() throws Exception {
@@ -29,21 +34,24 @@ public class ReflectiveMethodInvocationTest {
         transactionManager = new TransactionManager();
         MessageTracker.clearMsgs();
 
+        beanFactory = this.getBeanFactory("bean-v5.xml");
+        aspectInstanceFactory = this.getAspectInstanceFactory("tx");
+        aspectInstanceFactory.setBeanFactory(beanFactory);
         beforeAdvice = new AspectJBeforeAdvice(
                 TransactionManager.class.getMethod("start"),
                 null,
-                transactionManager
+                aspectInstanceFactory
         );
 
         afterAdvice = new AspectJAfterReturningAdvice(
                 TransactionManager.class.getMethod("commit"),
                 null,
-                transactionManager
+                aspectInstanceFactory
         );
         afterThrowingAdvice = new AspectJAfterThrowingAdvice(
                 TransactionManager.class.getMethod("rollback"),
                 null,
-                transactionManager
+                aspectInstanceFactory
         );
     }
 

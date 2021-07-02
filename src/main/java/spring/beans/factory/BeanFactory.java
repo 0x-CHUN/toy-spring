@@ -1,19 +1,11 @@
 package spring.beans.factory;
 
-public interface BeanFactory {
-    /**
-     * Get bean by beanId
-     *
-     * @param beanId
-     * @return object
-     */
-    Object getBean(String beanId);
+import java.util.List;
 
-    /**
-     * Get type
-     *
-     * @param name
-     * @return Class<?>
-     */
-    Class<?> getType(String name);
+public interface BeanFactory {
+    Object getBean(String beanID);
+
+    Class<?> getType(String name) /*throws NoSuchBeanDefinitionException*/;
+
+    List<Object> getBeansByType(Class<?> type);
 }

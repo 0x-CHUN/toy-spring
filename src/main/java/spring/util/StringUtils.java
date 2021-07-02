@@ -58,7 +58,7 @@ public abstract class StringUtils {
             return null;
         }
         StringTokenizer st = new StringTokenizer(str, delimiters);
-        List<String> tokens = new ArrayList<>();
+        List<String> tokens = new ArrayList<String>();
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
             if (trimTokens) {
@@ -85,6 +85,7 @@ public abstract class StringUtils {
         StringBuilder sb = new StringBuilder();
         int pos = 0; // our position in the old string
         int index = inString.indexOf(oldPattern);
+        // the index of an occurrence we've found, or -1
         int patLen = oldPattern.length();
         while (index >= 0) {
             sb.append(inString.substring(pos, index));
@@ -93,6 +94,7 @@ public abstract class StringUtils {
             index = inString.indexOf(oldPattern, pos);
         }
         sb.append(inString.substring(pos));
+        // remember to append any characters to the right of a match
         return sb.toString();
     }
 
@@ -145,4 +147,3 @@ public abstract class StringUtils {
         return sb.toString();
     }
 }
-

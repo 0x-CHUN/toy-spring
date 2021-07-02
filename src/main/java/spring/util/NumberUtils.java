@@ -6,7 +6,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 
-
 public abstract class NumberUtils {
     public static <T extends Number> T parseNumber(String text, Class<T> targetClass) {
         Assert.notNull(text, "Text must not be null");
@@ -151,4 +150,3 @@ public abstract class NumberUtils {
     }
 
 }
-

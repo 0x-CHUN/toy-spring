@@ -1,5 +1,7 @@
 package spring.beans.factory.config;
 
-public interface AutowireCapableBeanFactory {
+import spring.beans.factory.BeanFactory;
+
+public interface AutowireCapableBeanFactory extends BeanFactory {
     Object resolveDependency(DependencyDescriptor descriptor);
 }
